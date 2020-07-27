@@ -1,6 +1,7 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
+import 'package:prakhar_internship_musixmatch/bookmarks_list.dart';
 import 'package:prakhar_internship_musixmatch/stateManagementBloc.dart';
 import 'package:provider/provider.dart';
 import 'dart:convert';
@@ -20,6 +21,8 @@ class Home extends StatelessWidget {
   PossibleStates lastState = PossibleStates.noconnection;
 
   MyConnectivity _connectivity = MyConnectivity.instance;
+
+  final showBookmarkIcon = IconData(58417, fontFamily: 'MaterialIcons');
 
   Future getMusics(BuildContext context, StateManagementBloc bloc) async {
     bloc.setPossibleState(PossibleStates.loading);
@@ -79,11 +82,23 @@ class Home extends StatelessWidget {
             style: TextStyle(fontSize: 20, color: Colors.black),
           ),
         ),
+        actions: <Widget>[
+          IconButton(
+            icon: Icon(showBookmarkIcon, color: Colors.black),
+            onPressed: () {
+              Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => BookMarksList(_connectivity),
+                  ));
+            },
+          ),
+        ],
       ),
       backgroundColor: Colors.white,
       body: StreamBuilder<PossibleStates>(
         stream: bloc.possible_states_stream,
-        initialData: PossibleStates.loading,
+        initialData: PossibleStates.noconnection,
         builder: (context, snapshot) {
           return _buildContent(context, snapshot.data);
         },
@@ -99,7 +114,16 @@ class Home extends StatelessWidget {
       );
     else if (state == PossibleStates.noconnection) {
       return Center(
-        child: Text('No Internet Connection'),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: <Widget>[
+            Text('No Internet Connection'),
+            SizedBox(
+              height: 5,
+            ),
+            Text('Click on top right to access the offline bookmarks'),
+          ],
+        ),
       );
     } else
       return ListView.separated(

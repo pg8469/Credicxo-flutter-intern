@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:prakhar_internship_musixmatch/bookmarksBloc.dart';
 import 'package:prakhar_internship_musixmatch/stateManagementBloc.dart';
 import 'package:provider/provider.dart';
 import 'constants.dart';
@@ -8,6 +9,7 @@ import 'package:loading/loading.dart';
 import 'package:loading/indicator/ball_pulse_indicator.dart';
 import 'package:connectivity/connectivity.dart';
 import 'helper.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 
 class MusicDetails extends StatelessWidget {
   final TRACK_ID;
@@ -16,6 +18,9 @@ class MusicDetails extends StatelessWidget {
   MusicDetails(this.TRACK_ID, this._connectivity);
   var track_details;
   var lyrics;
+
+  final BOOKMARK_INACTIVE = IconData(59495, fontFamily: 'MaterialIcons');
+  final BOOKMARK_ACTIVE = IconData(59494, fontFamily: 'MaterialIcons');
 
   PossibleStates lastState = PossibleStates.noconnection;
 
@@ -59,6 +64,7 @@ class MusicDetails extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final bloc = Provider.of<StateManagementBloc>(context);
+    final bookbloc = Provider.of<BookmarksBloc>(context);
     _connectivity.initialise();
     _connectivity.myStream.listen((source) {
       if (source.keys.toList()[0] == ConnectivityResult.none) {
@@ -84,10 +90,30 @@ class MusicDetails extends StatelessWidget {
           'Track Details',
           style: TextStyle(fontSize: 20, color: Colors.black),
         ),
+        actions: <Widget>[
+          StreamBuilder<Tracks>(
+              stream: bookbloc.tracks_stream,
+              builder: (context, snapshot) {
+//                print('Built');
+                return IconButton(
+                  icon: Icon(
+                    (Tracks.isActive(TRACK_ID.toString()))
+                        ? BOOKMARK_ACTIVE
+                        : BOOKMARK_INACTIVE,
+                    color: Colors.black,
+                  ),
+                  onPressed: () {
+//                    print("Pressed");
+                    bookbloc.flipValue(TRACK_ID.toString(),
+                        track_details['track_name'].toString());
+                  },
+                );
+              })
+        ],
       ),
       body: StreamBuilder<PossibleStates>(
         stream: bloc.possible_states_stream,
-        initialData: PossibleStates.loading,
+        initialData: PossibleStates.noconnection,
         builder: (context, snapshot) {
           return _buildContent(context, snapshot.data);
         },
