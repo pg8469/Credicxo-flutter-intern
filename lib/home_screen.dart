@@ -1,6 +1,7 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
+import 'package:prakhar_internship_musixmatch/bookmarksBloc.dart';
 import 'package:prakhar_internship_musixmatch/bookmarks_list.dart';
 import 'package:prakhar_internship_musixmatch/stateManagementBloc.dart';
 import 'package:provider/provider.dart';
@@ -52,6 +53,7 @@ class Home extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final bloc = Provider.of<StateManagementBloc>(context);
+    final bookbloc = Provider.of<BookmarksBloc>(context);
     _connectivity.initialise();
     _connectivity.myStream.listen((source) {
       //If no Connection
